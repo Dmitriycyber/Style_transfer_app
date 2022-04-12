@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
-
+import numpy as np
 
 def clip_0_1(image):
     """
@@ -51,3 +51,27 @@ def show_pair(original, generated, title=None):
     imshow(original, 'Original Image')
     plt.subplot(1, 2, 2)
     imshow(generated, title)
+
+
+def get_vgg_layers_model(layer_names):
+    vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
+    vgg.trainable = False
+
+    outputs = [vgg.get_layer(name).output for name in layer_names]
+    model = tf.keras.Model([vgg.input], outputs)
+    return model
+
+
+def gram_matrix(input_tensor):
+    """
+    В вычислении грам матрицы есть небольшие изменения по сравнению с прошлым уроком
+    В этот раз мы делим не на W*H, а на W*H*C.
+    Принципиально это ничего не меняет. Это один из способов по разному взвесить
+    вклад разных слоев.
+    Такое вычисление используется, например, здесь: https://arxiv.org/pdf/1603.08155.pdf
+    """
+    result = tf.linalg.einsum('bijc,bijd->bcd', input_tensor, input_tensor)
+    input_shape = tf.shape(input_tensor)
+
+    num_locations = tf.cast(input_shape[1] * input_shape[2] * input_shape[3], tf.float32)
+    return result / (num_locations)
