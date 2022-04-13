@@ -22,9 +22,8 @@ class StyleAndContentExtractor:
         style_outputs = [gram_matrix(style_output) for style_output in style_outputs_layers]
         content_outputs = [content_output for content_output in content_outputs_layers]
 
-        features_dict = {}
-        features_dict["style"] = {name: value for name, value in zip(self.style_layers, style_outputs)}
-        features_dict["app"] = {name: value for name, value in zip(self.content_layers, content_outputs)}
+        features_dict = {"style": {name: value for name, value in zip(self.style_layers, style_outputs)},
+                         "app": {name: value for name, value in zip(self.content_layers, content_outputs)}}
 
         return features_dict
 
@@ -49,6 +48,7 @@ def train_step(image, loss_func, optimizer):
     optimizer.apply_gradients([(grad, image)])
     image.assign(clip_0_1(image))
     return loss.numpy()
+
 
 def clip_0_1(image):
     """
