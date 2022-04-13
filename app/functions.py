@@ -22,8 +22,9 @@ class StyleAndContentExtractor:
         style_outputs = [gram_matrix(style_output) for style_output in style_outputs_layers]
         content_outputs = [content_output for content_output in content_outputs_layers]
 
-        features_dict = {"style": {name: value for name, value in zip(self.style_layers, style_outputs)},
-                         "app": {name: value for name, value in zip(self.content_layers, content_outputs)}}
+        features_dict = {}
+        features_dict["style"] = {name: value for name, value in zip(self.style_layers, style_outputs)}
+        features_dict["content"] = {name: value for name, value in zip(self.content_layers, content_outputs)}
 
         return features_dict
 
@@ -32,7 +33,7 @@ def style_content_loss(image, style_targets, content_targets, style_weight, cont
     style_loss = None
     content_loss = None
     features_style = extractor(image)['style']
-    features_content = extractor(image)['content'],
+    features_content = extractor(image)['content']
     content_loss = tf.add_n([tf.keras.losses.MeanSquaredError()(features_content[name], content_targets[name])
                              for name in features_content.keys()])
     style_loss = tf.add_n([tf.keras.losses.MeanSquaredError()(features_style[name], style_targets[name])
@@ -41,14 +42,16 @@ def style_content_loss(image, style_targets, content_targets, style_weight, cont
     return loss
 
 
-def train_step(image, loss_func, optimizer):
+def train_step(image, loss_func, optimizer, style_targets, content_targets, style_weight, content_weight, tv_weight, extractor):
     with tf.GradientTape() as tape:
-        loss = loss_func(image)
+        loss = loss_func(image, style_targets, content_targets, style_weight, content_weight, tv_weight, extractor)
     grad = tape.gradient(loss, image)
     optimizer.apply_gradients([(grad, image)])
     image.assign(clip_0_1(image))
     return loss.numpy()
 
+def loss(image, style_targets, content_targets, style_weight, content_weight, tv_weight, extractor):
+    return style_content_loss(image, style_targets, content_targets, style_weight, content_weight, tv_weight, extractor)
 
 def clip_0_1(image):
     """
