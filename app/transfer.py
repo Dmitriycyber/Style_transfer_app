@@ -9,11 +9,6 @@ from pathlib import Path
 from tkinter.filedialog import askopenfilename
 from app.functions import load_img, imshow
 from app.functions import StyleAndContentExtractor, train_step, loss
-from IPython.display import Image
-Image("/content/result.png")
-
-# vgg = tf.keras.applications.VGG19(include_top=False, weights='imagenet')
-# vgg.summary()
 
 style_weight = 100.0
 content_weight = 5.0
