@@ -1,18 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import tensorflow as tf
-import time
-from tensorflow import keras
-from tkinter import ttk
-import pathlib
-from pathlib import Path
 from tkinter.filedialog import askopenfilename
-from app.functions import load_img, imshow
+from app.functions import load_img
 from app.functions import StyleAndContentExtractor, train_step, loss
 
-style_weight = 100.0
-content_weight = 5.0
-tv_weight = 0.1
+STYLE_WEIGHT = 100.0
+CONTENT_WEIGHT = 5.0
+TV_WEIGHT = 0.1
 
 style_layers = ['block1_conv1',
                 'block2_conv1',
@@ -40,15 +35,15 @@ content_targets = extractor(content_image)['content']
 image = tf.Variable(content_image)
 opt = tf.keras.optimizers.Adam(learning_rate=0.05, beta_1=0.99, epsilon=1e-2)
 
-start = time.time()
+# run style_transfer
 epochs = 1
-steps_per_epoch = 50
+steps_per_epoch = 3
 
 step = 0
 for n in range(epochs):
-  for m in range(steps_per_epoch):
-    step += 1
-    train_step(image, loss_func=loss, optimizer=opt, style_targets=style_targets, content_targets=content_targets,
-               style_weight=style_weight, content_weight=content_weight, tv_weight=tv_weight, extractor=extractor)
-plt.imsave("result.png", image.numpy()[0])
-end = time.time()
+    for m in range(steps_per_epoch):
+        step += 1
+        train_step(image, loss_func=loss, optimizer=opt, style_targets=style_targets, content_targets=content_targets,
+                   style_weight=STYLE_WEIGHT, content_weight=CONTENT_WEIGHT, tv_weight=TV_WEIGHT, extractor=extractor)
+plt.imsave("/Users/user/Desktop/projects/External/style_transfer/output/result.png", image.numpy()[0])
+
