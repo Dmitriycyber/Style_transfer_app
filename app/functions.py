@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import numpy as np
+import os
 
 
 class StyleAndContentExtractor:
@@ -21,7 +22,6 @@ class StyleAndContentExtractor:
 
         style_outputs = [gram_matrix(style_output) for style_output in style_outputs_layers]
         content_outputs = [content_output for content_output in content_outputs_layers]
-
         features_dict = {}
         features_dict["style"] = {name: value for name, value in zip(self.style_layers, style_outputs)}
         features_dict["content"] = {name: value for name, value in zip(self.content_layers, content_outputs)}
@@ -42,7 +42,8 @@ def style_content_loss(image, style_targets, content_targets, style_weight, cont
     return loss
 
 
-def train_step(image, loss_func, optimizer, style_targets, content_targets, style_weight, content_weight, tv_weight, extractor):
+def train_step(image, loss_func, optimizer, style_targets, content_targets, style_weight, content_weight, tv_weight,
+               extractor):
     with tf.GradientTape() as tape:
         loss = loss_func(image, style_targets, content_targets, style_weight, content_weight, tv_weight, extractor)
     grad = tape.gradient(loss, image)
@@ -50,8 +51,10 @@ def train_step(image, loss_func, optimizer, style_targets, content_targets, styl
     image.assign(clip_0_1(image))
     return loss.numpy()
 
+
 def loss(image, style_targets, content_targets, style_weight, content_weight, tv_weight, extractor):
     return style_content_loss(image, style_targets, content_targets, style_weight, content_weight, tv_weight, extractor)
+
 
 def clip_0_1(image):
     """
@@ -114,15 +117,44 @@ def get_vgg_layers_model(layer_names):
 
 
 def gram_matrix(input_tensor):
-    """
-    В вычислении грам матрицы есть небольшие изменения по сравнению с прошлым уроком
-    В этот раз мы делим не на W*H, а на W*H*C.
-    Принципиально это ничего не меняет. Это один из способов по разному взвесить
-    вклад разных слоев.
-    Такое вычисление используется, например, здесь: https://arxiv.org/pdf/1603.08155.pdf
-    """
+    """ Вычислении грам матрицы """
     result = tf.linalg.einsum('bijc,bijd->bcd', input_tensor, input_tensor)
     input_shape = tf.shape(input_tensor)
 
     num_locations = tf.cast(input_shape[1] * input_shape[2] * input_shape[3], tf.float32)
     return result / (num_locations)
+
+
+def transfer():
+    STYLE_PATH = os.getcwd() + "/misc/style_image.jpg"
+    CONTENT_PATH = os.getcwd() + "/misc/content_image.jpg"
+    print(STYLE_PATH)
+    print(CONTENT_PATH)
+    STYLE_WEIGHT = 5.0
+    CONTENT_WEIGHT = 100.0
+    TV_WEIGHT = 0.1
+    EPOCHS = 3
+    STEPS_PER_EPOCHS = 3
+    style_layers = ['block1_conv1',
+                    'block2_conv1',
+                    'block3_conv1',
+                    'block4_conv1',
+                    'block5_conv1']
+    content_layers = ['block4_conv2']
+    extractor = StyleAndContentExtractor(style_layers=style_layers, content_layers=content_layers)
+    style_image = load_img(STYLE_PATH, 1024)
+    content_image = load_img(CONTENT_PATH, 1024)
+    style_targets = extractor(style_image)['style']
+    content_targets = extractor(content_image)['content']
+    image = tf.Variable(content_image)
+    opt = tf.keras.optimizers.Adam(learning_rate=0.05, beta_1=0.99, epsilon=1e-2)
+    step = 0
+    for n in range(EPOCHS):
+        for m in range(STEPS_PER_EPOCHS):
+            step += 1
+            train_step(image, loss_func=loss, optimizer=opt, style_targets=style_targets,
+                       content_targets=content_targets,
+                       style_weight=STYLE_WEIGHT, content_weight=CONTENT_WEIGHT, tv_weight=TV_WEIGHT,
+                       extractor=extractor)
+    plt.imsave(os.getcwd() + "/output/result.jpg", image.numpy()[0])
+    print("OK")

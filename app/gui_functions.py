@@ -1,10 +1,10 @@
 import tkinter as tk
 from tkinter.filedialog import askopenfilename, asksaveasfilename
 import os
-from PIL import Image, ImageDraw
+from PIL import Image
 
 def open_file_style():
-    """Открываем файл для редактирования"""
+    """Choose style image"""
     filepath = askopenfilename(filetypes=[("Графические файлы", "*.jpeg"), ("Все файлы", "*.*")])
     if not os.path.exists("misc"):
         os.makedirs("misc")
@@ -12,13 +12,12 @@ def open_file_style():
     img = Image.open(filepath)
     os.chdir("misc")
     img.save('style_image.jpg')
-    print(os.getcwd())
     os.chdir("/Users/user/Desktop/projects/External/style_transfer")
 
 
 
 def open_file_content():
-    """Открываем файл для редактирования"""
+    """Choose content image"""
     filepath = askopenfilename(filetypes=[("Графические файлы", "*.jpeg"), ("Все файлы", "*.*")])
     if not os.path.exists("misc"):
         os.makedirs("misc")
