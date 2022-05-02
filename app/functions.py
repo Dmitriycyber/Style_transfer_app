@@ -126,15 +126,17 @@ def gram_matrix(input_tensor):
 
 
 def transfer():
+    device = tf.config.list_physical_devices('GPU')
+    print(len(device))
+    tf.config.experimental.set_memory_growth(device[0], True)
+    tf.config.experimental.set_virtual_device_configuration(device[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
     STYLE_PATH = os.getcwd() + "/misc/style_image.jpg"
     CONTENT_PATH = os.getcwd() + "/misc/content_image.jpg"
-    print(STYLE_PATH)
-    print(CONTENT_PATH)
     STYLE_WEIGHT = 5.0
     CONTENT_WEIGHT = 100.0
     TV_WEIGHT = 0.1
-    EPOCHS = 3
-    STEPS_PER_EPOCHS = 3
+    EPOCHS = 20
+    STEPS_PER_EPOCHS = 50
     style_layers = ['block1_conv1',
                     'block2_conv1',
                     'block3_conv1',
