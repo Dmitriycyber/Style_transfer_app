@@ -5,11 +5,3 @@
 # IntelliJ project files
 .idea
 *.iml
-out
-gen
-.gitignore
-.idea/.gitignore
-.idea/inspectionProfiles/
-.idea/misc.xml
-.idea/modules.xml
-.idea/style_transfer.iml
