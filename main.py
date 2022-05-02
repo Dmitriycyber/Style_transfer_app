@@ -18,8 +18,8 @@ txt_edit_style = tk.Text(window)
 fr_buttons = tk.Frame(window, relief=tk.RAISED, bd=2)
 btn_open_style = tk.Button(fr_buttons, text="Choose style image", command=open_file_style)
 btn_open_content = tk.Button(fr_buttons, text="Choose content image", command=open_file_content)
-btn_transfer = tk.Button(fr_buttons, text="Choose content image", command=transfer)
-###
+btn_transfer = tk.Button(fr_buttons, text="Transfer", command=transfer)
+###e
 btn_open_style.grid(row=0, column=0, sticky="ew", padx=7, pady=7)
 btn_open_content.grid(row=3, column=0, sticky="ew", padx=7, pady=7)
 btn_transfer.grid(row=5, column=0, sticky="ew", padx=7, pady=7)

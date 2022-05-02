@@ -12,7 +12,7 @@ def open_file_style():
     img = Image.open(filepath)
     os.chdir("misc")
     img.save('style_image.jpg')
-    os.chdir("/Users/user/Desktop/projects/External/style_transfer")
+    os.chdir("/Users/79038/Desktop/projects/External/style_transfer")
 
 
 
@@ -24,4 +24,4 @@ def open_file_content():
     img = Image.open(filepath)
     os.chdir("misc")
     img.save('content_image.jpg')
-    os.chdir("/Users/user/Desktop/projects/External/style_transfer")
+    os.chdir("/Users/79038/Desktop/projects/External/style_transfer")
