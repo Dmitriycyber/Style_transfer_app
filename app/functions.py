@@ -3,7 +3,6 @@ import tensorflow as tf
 import numpy as np
 import os
 
-
 class StyleAndContentExtractor:
     def __init__(self, style_layers, content_layers):
         self.style_layers = style_layers
@@ -128,28 +127,28 @@ def gram_matrix(input_tensor):
 def transfer():
     device = tf.config.list_physical_devices('GPU')
     print(len(device))
-    tf.config.experimental.set_memory_growth(device[0], True)
-    tf.config.experimental.set_virtual_device_configuration(device[0], [tf.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)])
+    tf.config.set_soft_device_placement(True)
+    tf.debugging.set_log_device_placement(True)
     STYLE_PATH = os.getcwd() + "/misc/style_image.jpg"
     CONTENT_PATH = os.getcwd() + "/misc/content_image.jpg"
     STYLE_WEIGHT = 5.0
     CONTENT_WEIGHT = 100.0
     TV_WEIGHT = 0.1
     EPOCHS = 20
-    STEPS_PER_EPOCHS = 50
+    STEPS_PER_EPOCHS = 30
     style_layers = ['block1_conv1',
                     'block2_conv1',
                     'block3_conv1',
                     'block4_conv1',
                     'block5_conv1']
-    content_layers = ['block4_conv2']
+    content_layers = ['block5_conv2']
     extractor = StyleAndContentExtractor(style_layers=style_layers, content_layers=content_layers)
-    style_image = load_img(STYLE_PATH, 1024)
-    content_image = load_img(CONTENT_PATH, 1024)
+    style_image = load_img(STYLE_PATH, 512)
+    content_image = load_img(CONTENT_PATH, 512)
     style_targets = extractor(style_image)['style']
     content_targets = extractor(content_image)['content']
     image = tf.Variable(content_image)
-    opt = tf.keras.optimizers.Adam(learning_rate=0.05, beta_1=0.99, epsilon=1e-2)
+    opt = tf.keras.optimizers.Adam(learning_rate=0.1, beta_1=0.99, epsilon=1e-2)
     step = 0
     for n in range(EPOCHS):
         for m in range(STEPS_PER_EPOCHS):
