@@ -8,11 +8,8 @@ def open_file_style():
     filepath = askopenfilename(filetypes=[("Графические файлы", "*.jpeg"), ("Все файлы", "*.*")])
     if not os.path.exists("misc"):
         os.makedirs("misc")
-    # os.mkdir("Users/user/Desktop/projects/External/style_transfer/misc")
     img = Image.open(filepath)
-    os.chdir("misc")
-    img.save('style_image.jpg')
-    os.chdir("/Users/user/Desktop/projects/External/style_transfer")
+    img.save(os.getcwd() + '/misc/style_image.png')
 
 
 
@@ -22,6 +19,4 @@ def open_file_content():
     if not os.path.exists("misc"):
         os.makedirs("misc")
     img = Image.open(filepath)
-    os.chdir("misc")
-    img.save('content_image.jpg')
-    os.chdir("/Users/user/Desktop/projects/External/style_transfer")
+    img.save(os.getcwd() + '/misc/content_image.png')
